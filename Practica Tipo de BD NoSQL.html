@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Memoria Técnica - EcoDrive</title>
+  <link rel="preconnect" href="[fonts.googleapis.com](https://fonts.googleapis.com)">
+  <link rel="preconnect" href="[fonts.gstatic.com](https://fonts.gstatic.com)" crossorigin>
+  <link href="[fonts.googleapis.com](https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap)" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #007bff;
+      --sidebar: #2c3e50;
+      --secondary: #6c757d;
+      --success: #28a745;
+      --danger: #dc3545;
+      --warning: #ffc107;
+      --info: #17a2b8;
+      --light: #f8f9fa;
+      --border: #dee2e6;
+      --text: #212529;
+      --muted: #6c757d;
+      --code-bg: #1e1e1e;
+      --code-text: #f8f9fa;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background: #f4f6f9;
+      color: var(--text);
+      line-height: 1.65;
+    }
+
+    .page {
+      max-width: 1100px;
+      margin: 40px auto;
+      background: white;
+      border-radius: 18px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+      overflow: hidden;
+    }
+
+    .hero {
+      background: linear-gradient(135deg, var(--sidebar), var(--primary));
+      color: white;
+      padding: 48px 48px 36px;
+    }
+
+    .hero .eyebrow {
+      font-size: 0.95rem;
+      font-weight: 600;
+      opacity: 0.9;
+      margin-bottom: 10px;
+    }
+
+    .hero h1 {
+      margin: 0 0 14px;
+      font-size: 2.2rem;
+      line-height: 1.2;
+    }
+
+    .hero p {
+      margin: 0;
+      max-width: 850px;
+      opacity: 0.95;
+    }
+
+    .meta {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      padding: 24px 48px;
+      background: #f8fbff;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .meta-card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+    }
+
+    .meta-card .label {
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-bottom: 6px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .meta-card .value {
+      font-weight: 700;
+      color: var(--sidebar);
+    }
+
+    .content {
+      padding: 40px 48px 56px;
+    }
+
+    h2 {
+      font-size: 1.65rem;
+      margin-top: 42px;
+      margin-bottom: 14px;
+      color: var(--sidebar);
+      border-left: 6px solid var(--primary);
+      padding-left: 14px;
+    }
+
+    h3 {
+      font-size: 1.15rem;
+      margin-top: 28px;
+      margin-bottom: 10px;
+      color: var(--primary);
+    }
+
+    p {
+      margin: 12px 0;
+    }
+
+    ul, ol {
+      margin: 12px 0 12px 20px;
+    }
+
+    li {
+      margin: 8px 0;
+    }
+
+    .highlight {
+      background: #eef6ff;
+      border-left: 5px solid var(--primary);
+      padding: 14px 16px;
+      border-radius: 10px;
+      margin: 18px 0;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 18px;
+      margin: 20px 0;
+    }
+
+    .card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+    }
+
+    .card h4 {
+      margin: 0 0 10px;
+      font-size: 1rem;
+      color: var(--sidebar);
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 5px 10px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      border-radius: 999px;
+      margin-bottom: 10px;
+    }
+
+    .badge.mongo { background: #e8f5e9; color: #2e7d32; }
+    .badge.cassandra { background: #ede7f6; color: #5e35b1; }
+    .badge.redis { background: #ffebee; color: #c62828; }
+    .badge.neo4j { background: #e3f2fd; color: #1565c0; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 18px 0 24px;
+      overflow: hidden;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+    }
+
+    thead {
+      background: var(--sidebar);
+      color: white;
+    }
+
+    th, td {
+      padding: 14px 12px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+
+    tbody tr:nth-child(even) {
+      background: #fafbfc;
+    }
+
+    code {
+      background: #f1f3f5;
+      padding: 2px 6px;
+      border-radius: 6px;
+      font-family: Consolas, monospace;
+      font-size: 0.92em;
+    }
+
+    pre {
+      background: var(--code-bg);
+      color: var(--code-text);
+      padding: 18px;
+      border-radius: 12px;
+      overflow-x: auto;
+      font-size: 0.92rem;
+      line-height: 1.5;
+      margin: 16px 0 24px;
+    }
+
+    .footer {
+      border-top: 1px solid var(--border);
+      padding: 26px 48px 40px;
+      color: var(--muted);
+      background: #fafafa;
+      font-size: 0.95rem;
+    }
+
+    .small {
+      font-size: 0.95rem;
+      color: var(--muted);
+    }
+
+    @media (max-width: 768px) {
+      .hero,
+      .meta,
+      .content,
+      .footer {
+        padding-left: 22px;
+        padding-right: 22px;
+      }
+
+      .hero h1 {
+        font-size: 1.7rem;
+      }
+
+      h2 {
+        font-size: 1.4rem;
+      }
+    }
+
+    @media print {
+      body {
+        background: white;
+      }
+
+      .page {
+        box-shadow: none;
+        margin: 0;
+        max-width: 100%;
+        border-radius: 0;
+      }
+
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header class="hero">
+      <div class="eyebrow">Proyecto de Evaluación · Arquitectura Políglota en EcoDrive</div>
+      <h1>Memoria Técnica — Persistencia Políglota con Bases de Datos NoSQL</h1>
+      <p>
+        Documento de análisis, justificación arquitectónica, auditoría de código generado con IA,
+        scripts de carga y consultas realizados para los cuatro subsistemas críticos de EcoDrive:
+        catálogo de vehículos, telemetría IoT, sesiones activas y red social de carpooling.
+      </p>
+    </header>
+
+    <section class="meta">
+      <div class="meta-card">
+        <div class="label">Alumno</div>
+        <div class="value">Leandro Trista Hernandez</div>
+      </div>
+      <div class="meta-card">
+        <div class="label">Curso</div>
+        <div class="value">2025-2026</div>
+      </div>
+      <div class="meta-card">
+        <div class="label">Proyecto</div>
+        <div class="value">EcoDrive · NoSQL</div>
+      </div>
+      <div class="meta-card">
+        <div class="label">Tecnologías</div>
+        <div class="value">MongoDB, Cassandra, Redis y Neo4j</div>
+      </div>
+    </section>
+
+    <main class="content">
+      <h2>1. Introducción</h2>
+      <p>
+        EcoDrive es una plataforma de movilidad urbana sostenible que ofrece alquiler de patinetes eléctricos,
+        bicicletas y coches compartidos. Debido a su crecimiento y a la diversidad de datos manejados por la
+        plataforma, una única base de datos relacional tradicional deja de ser suficiente para cubrir todas las
+        necesidades del sistema.
+      </p>
+      <p>
+        Por ello, se plantea una arquitectura de <strong>persistencia políglota</strong>, seleccionando para cada
+        servicio el motor NoSQL más adecuado según el tipo de datos, el volumen de escrituras, la necesidad de
+        escalado y el patrón principal de consulta.
+      </p>
+
+      <div class="highlight">
+        En esta memoria se justifican las decisiones arquitectónicas, se documenta la auditoría crítica del código
+        generado con IA y se incluyen los scripts finales de carga y consulta para cada motor NoSQL utilizado.
+      </div>
+
+      <h2>2. Justificación arquitectónica</h2>
+      <p>
+        La selección de cada sistema gestor se ha realizado en función del caso de uso concreto de cada servicio.
+        La idea principal no es usar una sola base de datos para todo, sino elegir el modelo de persistencia que mejor
+        resuelve cada necesidad.
+      </p>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Servicio</th>
+            <th>SGBD elegido</th>
+            <th>Tipo NoSQL</th>
+            <th>Justificación</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Catálogo de vehículos y mantenimiento</td>
+            <td>MongoDB</td>
+            <td>Documental</td>
+            <td>Permite almacenar vehículos con atributos distintos y un historial de mantenimiento flexible dentro del mismo documento.</td>
+          </tr>
+          <tr>
+            <td>Telemetría y sensores IoT</td>
+            <td>Apache Cassandra</td>
+            <td>Columnar</td>
+            <td>Optimizado para escrituras masivas, escalado horizontal y consulta eficiente del historial temporal por vehículo.</td>
+          </tr>
+          <tr>
+            <td>Sesiones activas y caché de batería</td>
+            <td>Redis</td>
+            <td>Clave-valor</td>
+            <td>Respuesta muy rápida en memoria, soporte nativo para TTL y estructuras eficientes para estado temporal y campos modificables.</td>
+          </tr>
+          <tr>
+            <td>Red social de carpooling</td>
+            <td>Neo4j</td>
+            <td>Grafos</td>
+            <td>Ideal para modelar relaciones entre usuarios, amistades, rutas compartidas y recomendaciones basadas en conexiones.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2>3. Elementos de diseño utilizados</h2>
+
+      <div class="grid-2">
+        <div class="card">
+          <span class="badge mongo">MongoDB</span>
+          <h4>Agregados y documentos</h4>
+          <p>
+            Se ha modelado un documento por vehículo, incrustando en él el historial de mantenimiento.
+            Esto permite almacenar tipos de vehículos distintos sin un esquema rígido.
+          </p>
+          <p><strong>Campos incrustados:</strong> <code>mantenimientos</code>, <code>piezas</code>, <code>coste</code>, <code>fecha</code>.</p>
+        </div>
+
+        <div class="card">
+          <span class="badge cassandra">Cassandra</span>
+          <h4>Partition Key y Clustering Column</h4>
+          <p>
+            La tabla de telemetría se ha diseñado siguiendo el enfoque query-first.
+            La <code>Partition Key</code> es <code>vehicle_id</code> y la <code>Clustering Column</code> es <code>event_time</code>.
+          </p>
+          <p><strong>Objetivo:</strong> consultar el historial completo de un vehículo de forma eficiente.</p>
+        </div>
+
+        <div class="card">
+          <span class="badge redis">Redis</span>
+          <h4>Tipos de datos</h4>
+          <p>
+            Para sesiones temporales se ha usado expiración automática mediante TTL.
+            Para la batería y estado de los vehículos se han utilizado estructuras <code>HASH</code>.
+          </p>
+          <p><strong>Claves:</strong> <code>sesion:token:ABC123</code>, <code>vehiculo:veh001</code>.</p>
+        </div>
+
+        <div class="card">
+          <span class="badge neo4j">Neo4j</span>
+          <h4>Nodos y relaciones</h4>
+          <p>
+            Se han definido nodos <code>Usuario</code>, <code>Ruta</code> y relaciones con semántica clara
+            como <code>AMIGO_DE</code> y <code>VIAJA_A</code>.
+          </p>
+          <p><strong>Modelo relacional del grafo:</strong> usuarios conectados por amistad y por destino de viaje.</p>
+        </div>
+      </div>
+
+      <h2>4. Prompts utilizados para la generación inicial con IA</h2>
+      <p>
+        Para obtener una primera propuesta de scripts se utilizaron prompts específicos para cada motor,
+        indicando restricciones de modelado y evitando errores típicos de enfoque relacional.
+      </p>
+
+      <h3>Prompt para MongoDB</h3>
+      <pre>Genera un script MongoDB para una colección de vehículos de EcoDrive.
+Debe incluir patinetes, bicicletas y coches con atributos diferentes por tipo.
+Incluye historial de mantenimiento.
+Evita diseño relacional y usa documentos agregados si vehículo y mantenimiento se consultan juntos.</pre>
+
+      <h3>Prompt para Cassandra</h3>
+      <pre>Genera un script CQL para telemetría IoT de vehículos de EcoDrive.
+La consulta principal es obtener el historial completo de un vehículo concreto por fecha.
+Diseña la tabla con enfoque query-first, indicando Partition Key y Clustering Column correctos.
+Inserta 5 registros para el mismo vehículo.</pre>
+
+      <h3>Prompt para Redis</h3>
+      <pre>Genera comandos Redis para sesiones temporales y caché de batería de vehículos de EcoDrive.
+Usa TTL para sesiones y evita usar solo strings para todo.
+Prioriza HASH si permite modificar campos individuales como batería.</pre>
+
+      <h3>Prompt para Neo4j</h3>
+      <pre>Genera un script Cypher para una red social de carpooling en EcoDrive.
+Crea usuarios, rutas y relaciones semánticas con dirección, como AMIGO_DE y VIAJA_A.
+Evita tratar los nodos como tablas relacionales.</pre>
+
+      <h2>5. Auditoría crítica del código generado por IA</h2>
+      <p>
+        Tras generar las primeras propuestas de código, se realizó una auditoría para detectar antipatrones NoSQL.
+        El objetivo fue corregir diseños demasiado relacionales o estructuras poco adecuadas para cada motor.
+      </p>
+
+      <h3>Corrección técnica 1 — MongoDB: evitar normalización encubierta</h3>
+      <p>
+        La propuesta inicial separaba la información en dos colecciones: una para vehículos y otra para mantenimientos,
+        relacionándolas mediante un identificador. Este diseño imitaba el modelo relacional y obligaba a reconstruir
+        los datos mediante referencias.
+      </p>
+      <p>
+        Se corrigió incrustando el historial de mantenimiento dentro del documento del vehículo, ya que ambos datos
+        se consultan habitualmente de forma conjunta. Esto mejora el rendimiento de lectura y respeta el concepto
+        de agregado documental.
+      </p>
+
+      <h3>Corrección técnica 2 — Cassandra: rediseño de la clave primaria</h3>
+      <p>
+        La propuesta inicial no estaba orientada a la consulta real del sistema y utilizaba un diseño de clave
+        primaria poco adecuado. Se rediseñó la tabla usando <code>vehicle_id</code> como
+        <code>Partition Key</code> y <code>event_time</code> como <code>Clustering Column</code>.
+      </p>
+      <p>
+        Este cambio permite que los datos de un mismo vehículo queden agrupados lógicamente y que el historial
+        pueda consultarse por orden temporal, evitando además problemas de distribución como hotspots.
+      </p>
+
+      <h3>Corrección técnica 3 — Redis: uso de HASH en lugar de String JSON</h3>
+      <p>
+        La IA proponía almacenar el estado de cada vehículo como un único string con formato JSON. Aunque funcional,
+        esta solución no es la más eficiente para Redis cuando se quiere modificar solo un campo concreto.
+      </p>
+      <p>
+        Se cambió a estructuras <code>HASH</code> mediante <code>HSET</code> y <code>HINCRBY</code>,
+        lo que permite actualizar directamente la batería sin reescribir todo el objeto.
+      </p>
+
+      <h3>Corrección técnica 4 — Neo4j: relaciones con semántica</h3>
+      <p>
+        Se revisó el modelado para asegurar que Neo4j no se usara como una tabla SQL disfrazada.
+        Las relaciones se definieron con nombres y dirección clara, por ejemplo
+        <code>(:Usuario)-[:AMIGO_DE]-&gt;(:Usuario)</code> y
+        <code>(:Usuario)-[:VIAJA_A]-&gt;(:Ruta)</code>.
+      </p>
+
+      <h2>6. Scripts finales de carga y consultas</h2>
+
+      <h3>6.1. MongoDB — Catálogo de vehículos</h3>
+      <p class="small">Inserción de tres vehículos con atributos distintos y mantenimiento incrustado.</p>
+      <pre>use ecodrive
+
+db.vehiculos.insertMany([
+  {
+    _id: "veh001",
+    tipo: "patinete",
+    marca: "Xiaomi",
+    modelo: "Mi Scooter Pro 2",
+    autonomia_km: 45,
+    limite_peso_kg: 100,
+    disponible: true,
+    mantenimientos: [
+      {
+        fecha: ISODate("2026-03-01T10:00:00Z"),
+        tipo: "freno",
+        piezas: ["pastillas de freno"],
+        coste: 35
+      }
+    ]
+  },
+  {
+    _id: "veh002",
+    tipo: "bicicleta",
+    marca: "Orbea",
+    modelo: "Urban Ride",
+    autonomia_km: 70,
+    marchas: 7,
+    disponible: true,
+    mantenimientos: [
+      {
+        fecha: ISODate("2026-03-12T09:30:00Z"),
+        tipo: "transmisión",
+        piezas: ["cadena", "piñón"],
+        coste: 55
+      }
+    ]
+  },
+  {
+    _id: "veh003",
+    tipo: "coche",
+    marca: "Renault",
+    modelo: "Zoe",
+    autonomia_km: 300,
+    tipo_combustible: "eléctrico",
+    plazas: 5,
+    disponible: false,
+    mantenimientos: [
+      {
+        fecha: ISODate("2026-03-20T16:00:00Z"),
+        tipo: "batería",
+        piezas: ["módulo BMS"],
+        coste: 320
+      }
+    ]
+  }
+])</pre>
+
+      <p class="small">Consulta de vehículos que tengan el atributo <code>tipo_combustible</code>.</p>
+      <pre>db.vehiculos.find(
+  { tipo_combustible: { $exists: true } },
+  { _id: 1, tipo: 1, marca: 1, modelo: 1, tipo_combustible: 1 }
+)</pre>
+
+      <h3>6.2. Cassandra — Telemetría IoT</h3>
+      <p class="small">Creación del keyspace y de la tabla siguiendo un diseño orientado a consulta.</p>
+      <pre>CREATE KEYSPACE IF NOT EXISTS ecodrive
+WITH replication = {'class': 'SimpleStrategy', 'replication_factor': 1};
+
+USE ecodrive;
+
+CREATE TABLE IF NOT EXISTS telemetria_por_vehiculo (
+    vehicle_id text,
+    event_time timestamp,
+    lat double,
+    lon double,
+    speed double,
+    battery_level int,
+    PRIMARY KEY ((vehicle_id), event_time)
+) WITH CLUSTERING ORDER BY (event_time DESC);</pre>
+
+      <p class="small">Inserción de cinco registros de telemetría para el mismo vehículo.</p>
+      <pre>INSERT INTO telemetria_por_vehiculo (vehicle_id, event_time, lat, lon, speed, battery_level)
+VALUES ('veh001', '2026-04-28 08:00:00', 40.4168, -3.7038, 12.5, 96);
+
+INSERT INTO telemetria_por_vehiculo (vehicle_id, event_time, lat, lon, speed, battery_level)
+VALUES ('veh001', '2026-04-28 08:05:00', 40.4171, -3.7042, 14.0, 94);
+
+INSERT INTO telemetria_por_vehiculo (vehicle_id, event_time, lat, lon, speed, battery_level)
+VALUES ('veh001', '2026-04-28 08:10:00', 40.4175, -3.7048, 10.8, 92);
+
+INSERT INTO telemetria_por_vehiculo (vehicle_id, event_time, lat, lon, speed, battery_level)
+VALUES ('veh001', '2026-04-28 08:15:00', 40.4180, -3.7053, 0.0, 91);
+
+INSERT INTO telemetria_por_vehiculo (vehicle_id, event_time, lat, lon, speed, battery_level)
+VALUES ('veh001', '2026-04-28 08:20:00', 40.4184, -3.7059, 16.1, 89);</pre>
+
+      <p class="small">Consulta del historial completo de telemetría de un vehículo específico.</p>
+      <pre>SELECT *
+FROM telemetria_por_vehiculo
+WHERE vehicle_id = 'veh001';</pre>
+
+      <h3>6.3. Redis — Sesiones y caché de batería</h3>
+      <p class="small">Creación de una sesión temporal con expiración automática en 60 segundos.</p>
+      <pre>SET sesion:token:ABC123 "user_001|veh001|trip_9001" EX 60
+TTL sesion:token:ABC123</pre>
+
+      <p class="small">Registro de batería de tres vehículos distintos usando convención jerárquica con dos puntos.</p>
+      <pre>HSET vehiculo:veh001 tipo patinete bateria 87 disponible true
+HSET vehiculo:veh002 tipo bicicleta bateria 65 disponible true
+HSET vehiculo:veh003 tipo coche bateria 43 disponible false
+
+HINCRBY vehiculo:veh001 bateria -5
+HGETALL vehiculo:veh001</pre>
+
+      <h3>6.4. Neo4j — Red social de carpooling</h3>
+      <p class="small">Inserción de nodos y relaciones entre usuarios y rutas.</p>
+      <pre>CREATE
+  (u1:Usuario {id:'u1', nombre:'Ana'}),
+  (u2:Usuario {id:'u2', nombre:'Luis'}),
+  (u3:Usuario {id:'u3', nombre:'Marta'}),
+  (r1:Ruta {id:'r1', origen:'Atocha', destino:'Chamartin'}),
+  (r2:Ruta {id:'r2', origen:'Sol', destino:'Chamartin'}),
+
+  (u1)-[:AMIGO_DE]->(u2),
+  (u2)-[:AMIGO_DE]->(u1),
+  (u2)-[:AMIGO_DE]->(u3),
+  (u3)-[:AMIGO_DE]->(u2),
+
+  (u1)-[:VIAJA_A]->(r1),
+  (u2)-[:VIAJA_A]->(r1),
+  (u3)-[:VIAJA_A]->(r2);</pre>
+
+      <p class="small">Consulta de usuarios que viajan al mismo destino y además son amigos entre sí.</p>
+      <pre>MATCH (u1:Usuario)-[:VIAJA_A]->(r:Ruta)<-[:VIAJA_A]-(u2:Usuario),
+      (u1)-[:AMIGO_DE]->(u2)
+WHERE u1.id < u2.id
+RETURN u1.nombre AS usuario1, u2.nombre AS usuario2, r.destino AS destino;</pre>
+
+      <h2>7. Ejecución y visualización</h2>
+      <p>
+        Para validar la implementación, se deben incluir capturas de pantalla de la ejecución de los scripts y
+        de los resultados de las consultas en cada motor. Estas capturas pueden obtenerse desde consola o desde
+        interfaces visuales como Mongo Express, RedisInsight o Neo4j Browser.
+      </p>
+      <ul>
+        <li>Captura de inserción y consulta en MongoDB.</li>
+        <li>Captura de creación de tabla, inserciones y consulta en Cassandra.</li>
+        <li>Captura de comandos Redis con TTL y modificación de batería.</li>
+        <li>Captura del grafo y de la consulta ejecutada en Neo4j.</li>
+      </ul>
+
+      <h2>8. Conclusión</h2>
+      <p>
+        La práctica demuestra que una arquitectura NoSQL eficaz no consiste en sustituir una base de datos
+        relacional por otra única tecnología, sino en seleccionar el motor más adecuado para cada necesidad concreta.
+        En este caso, MongoDB ofrece flexibilidad documental para el catálogo, Cassandra soporta la telemetría masiva,
+        Redis resuelve el estado temporal con gran velocidad y Neo4j modela de forma natural la red social de usuarios.
+      </p>
+      <p>
+        Además, la auditoría del código generado con IA ha permitido corregir varios antipatrones habituales,
+        mejorando el diseño final y alineándolo con los principios de modelado propios de cada sistema NoSQL.
+      </p>
+    </main>
+
+    <footer class="footer">
+      <strong>Alumno:</strong> Leandro Trista Hernandez<br>
+      <strong>Práctica:</strong> Arquitectura Políglota en EcoDrive<br>
+      <strong>Formato recomendado:</strong> abrir en navegador y exportar con “Imprimir → Guardar como PDF”
+    </footer>
+  </div>
+</body>
+</html>
