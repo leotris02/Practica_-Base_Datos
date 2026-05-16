@@ -482,8 +482,13 @@ Evita tratar los nodos como tablas relacionales.</pre>
       <p>
         Se revisó el modelado para asegurar que Neo4j no se usara como una tabla SQL disfrazada.
         Las relaciones se definieron con nombres y dirección clara, por ejemplo
-        <code>(:Usuario)-[:AMIGO_DE]-&gt;(:Usuario)</code> y
-        <code>(:Usuario)-[:VIAJA_A]-&gt;(:Ruta)</code>.
+        <code>(:Person)-[:FRIEND_OF]-&gt;(:Person)</code> y
+        <code>(:Person)-[:JOINED]-&gt;(:Trip)</code>.
+        La IA genero varios CREATE para cargar los datos de la tabla, lo cual daba error
+        al realizar consultas. Esto fue evitado atomizando el script de carga.
+        La IA no quiso añadir originalmente datos a las relaciones, se las añadi
+        escribiendo las primeras a <code>(:person)-[JOINED]-&gt;(:Trip)</code> y luego el resto a partir de esas
+        autocompleto copilot. Esto permitió crear un grafo con relaciones entre usuarios y rutas, y no solo nodos sin conexiones.
       </p>
 
       <h2>6. Scripts finales de carga y consultas</h2>
@@ -620,67 +625,68 @@ CREATE
 (grace:Person {id:7, name:'Grace', age:27}),
 (hugo:Person {id:8, name:'Hugo', age:33}),
 (irene:Person {id:9, name:'Irene', age:30}),
-(javier:Person {id:10, name:'Javier', age:32});
+(javier:Person {id:10, name:'Javier', age:32}),
 
-// =======================
-// NODOS: UBICACIONES
-// =======================
-
-CREATE
 (madrid:Location {name:'Madrid'}),
 (barcelona:Location {name:'Barcelona'}),
 (valencia:Location {name:'Valencia'}),
 (sevilla:Location {name:'Sevilla'}),
 (zaragoza:Location {name:'Zaragoza'}),
-(bilbao:Location {name:'Bilbao'});
+(bilbao:Location {name:'Bilbao'}),
 
-// =======================
-// RELACIONES DE AMISTAD
-// =======================
+(alice)-[:FRIEND_OF
+]->(bob),
+(bob)-[:FRIEND_OF
+]->(alice),
 
-CREATE
-(alice)-[:FRIEND]->(bob),
-(bob)-[:FRIEND]->(alice),
+(alice)-[:FRIEND_OF
+]->(carla),
+(carla)-[:FRIEND_OF
+]->(alice),
 
-(alice)-[:FRIEND]->(carla),
-(carla)-[:FRIEND]->(alice),
+(bob)-[:FRIEND_OF
+]->(david),
+(david)-[:FRIEND_OF
+]->(bob),
 
-(bob)-[:FRIEND]->(david),
-(david)-[:FRIEND]->(bob),
+(carla)-[:FRIEND_OF
+]->(elena),
+(elena)-[:FRIEND_OF
+]->(carla),
 
-(carla)-[:FRIEND]->(elena),
-(elena)-[:FRIEND]->(carla),
+(carla)-[:FRIEND_OF
+]->(bob),
+(bob)-[:FRIEND_OF
+]->(carla),
 
-(elena)-[:FRIEND]->(grace),
-(grace)-[:FRIEND]->(elena),
+(elena)-[:FRIEND_OF
+]->(grace),
+(grace)-[:FRIEND_OF
+]->(elena),
 
-(frank)-[:FRIEND]->(hugo),
-(hugo)-[:FRIEND]->(frank),
+(frank)-[:FRIEND_OF
+]->(hugo),
+(hugo)-[:FRIEND_OF
+]->(frank),
 
-(hugo)-[:FRIEND]->(irene),
-(irene)-[:FRIEND]->(hugo),
+(hugo)-[:FRIEND_OF
+]->(irene),
+(irene)-[:FRIEND_OF
+]->(hugo),
 
-(irene)-[:FRIEND]->(javier),
-(javier)-[:FRIEND]->(irene);
+(irene)-[:FRIEND_OF
+]->(javier),
+(javier)-[:FRIEND_OF
+]->(irene),
 
-// =======================
-// NODOS: VIAJES
-// =======================
-
-CREATE
 (t1:Trip {id:101, date:'2026-05-10'}),
 (t2:Trip {id:102, date:'2026-05-11'}),
 (t3:Trip {id:103, date:'2026-05-12'}),
 (t4:Trip {id:104, date:'2026-05-13'}),
 (t5:Trip {id:105, date:'2026-05-14'}),
 (t6:Trip {id:106, date:'2026-05-15'}),
-(t7:Trip {id:107, date:'2026-05-16'});
+(t7:Trip {id:107, date:'2026-05-16'}),
 
-// =======================
-// RELACIONES: ORIGEN Y DESTINO
-// =======================
-
-CREATE
 (t1)-[:STARTS_AT]->(madrid),
 (t1)-[:ENDS_AT]->(barcelona),
 
@@ -700,63 +706,59 @@ CREATE
 (t6)-[:ENDS_AT]->(madrid),
 
 (t7)-[:STARTS_AT]->(madrid),
-(t7)-[:ENDS_AT]->(sevilla);
+(t7)-[:ENDS_AT]->(sevilla),
 
-// =======================
-// RELACIONES: PARTICIPACIÓN
-// =======================
+(alice)-[:JOINED {rating: 5}]->(t1),
+(bob)-[:JOINED {rating: 4}]->(t1),
 
-CREATE
-(alice)-[:JOINED]->(t1),
-(bob)-[:JOINED]->(t1),
+(carla)-[:JOINED {rating: 2}]->(t2),
+(david)-[:JOINED {rating: 3}]->(t2),
 
-(carla)-[:JOINED]->(t2),
-(david)-[:JOINED]->(t2),
+(elena)-[:JOINED {rating: 4}]->(t3),
+(frank)-[:JOINED {rating: 5}]->(t3),
 
-(elena)-[:JOINED]->(t3),
-(frank)-[:JOINED]->(t3),
+(grace)-[:JOINED {rating: 2}]->(t4),
+(hugo)-[:JOINED {rating: 4}]->(t4),
 
-(grace)-[:JOINED]->(t4),
-(hugo)-[:JOINED]->(t4),
+(irene)-[:JOINED {rating: 3}]->(t5),
+(alice)-[:JOINED {rating: 5}]->(t5),
 
-(irene)-[:JOINED]->(t5),
-(alice)-[:JOINED]->(t5),
+(javier)-[:JOINED {rating: 4}]->(t6),
+(bob)-[:JOINED {rating: 4}]->(t6),
 
-(javier)-[:JOINED]->(t6),
-(bob)-[:JOINED]->(t6),
+(carla)-[:JOINED {rating: 2}]->(t7),
+(grace)-[:JOINED {rating: 3}]->(t7);
+</pre>
 
-(carla)-[:JOINED]->(t7),
-(grace)-[:JOINED]->(t7);</pre>
-
-      <p class="small">Consulta de usuarios que viajan al mismo destino y además son amigos entre sí.</p>
-      <pre>
-MATCH (user:Person {name:'Alice'})
+      <p class="small">Consulta de personas que realizan el mismo viaje sin esa persona</p>
+      <pre>MATCH (user:Person {name:'Bob'})
 MATCH (candidate:Person)-[:JOINED]->(trip:Trip)
+MATCH (user)-[:JOINED]->(utrip:Trip)
 MATCH (trip)-[:STARTS_AT]->(start)
 MATCH (trip)-[:ENDS_AT]->(end)
+MATCH (utrip)-[:STARTS_AT]->(ustart)
+MATCH (utrip)-[:ENDS_AT]->(uend)
 
-WHERE candidate <> user
+WHERE candidate <> user AND uend = end AND ustart = start AND trip <> utrip
 
-AND EXISTS {
-    MATCH (user)-[:JOINED]->(myTrip:Trip)
-    MATCH (myTrip)-[:STARTS_AT]->(start)
-    MATCH (myTrip)-[:ENDS_AT]->(end)
-}
 
-RETURN DISTINCT candidate.name;</pre>
 
+RETURN DISTINCT candidate.name;
+</pre>
       <h2>7. Ejecución y visualización</h2>
       <p>
         Para validar la implementación, se deben incluir capturas de pantalla de la ejecución de los scripts y
         de los resultados de las consultas en cada motor. Estas capturas pueden obtenerse desde consola o desde
         interfaces visuales como Mongo Express, RedisInsight o Neo4j Browser.
       </p>
-      <ul>
-        <li>Captura de inserción y consulta en MongoDB.</li>
-        <li>Captura de creación de tabla, inserciones y consulta en Cassandra.</li>
-        <li>Captura de comandos Redis con TTL y modificación de batería.</li>
-        <li>Captura del grafo y de la consulta ejecutada en Neo4j.</li>
-      </ul>
+
+        <h3>Captura de inserción y consulta en MongoDB.</h3>
+      
+        <h3>Captura de comandos Redis con TTL y modificación de batería.</h3>
+        <h3>7.3.1 Captura del grafo en neo4j</h3>
+        <img src="imagenes/neo4j/neo_carga.png" alt="">
+        <h3>7.3.2 Captura de consulta en neo4j</h3>
+        <img src="imagenes/neo4j/neo_consulta.png" alt="">
 
       <h2>8. Conclusión</h2>
       <p>
