@@ -1,0 +1,10 @@
+version: '3.8'
+services:
+  redis-ecodrive:
+    image: redis:alpine
+    container_name: redis_server
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./datos_redis:/data
+    command: redis-server --appendonly yes

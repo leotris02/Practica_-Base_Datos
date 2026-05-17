@@ -1,0 +1,25 @@
+# ==========================================
+# PROYECTO ECODRIVER: SCRIPT DE CARGA REDIS
+# ==========================================
+
+# 1. NODOS: VEHÍCULOS (Estructura HASH)
+# ------------------------------------------
+HSET vehiculo:001 tipo "patinete" marca "Xiaomi" bateria 100 estado "disponible"
+HSET vehiculo:002 tipo "bici" marca "Orbea" bateria 85 estado "en_uso"
+HSET vehiculo:003 tipo "coche" marca "Tesla" bateria 40 estado "en_carga"
+
+# 2. OPERACIÓN DE PRUEBA (Actualización de batería)
+# ------------------------------------------
+HINCRBY vehiculo:003 bateria -5
+
+# 3. GESTIÓN DE SESIONES (Estructura STRING con TTL)
+# ------------------------------------------
+# Sesión para el usuario Alice (ID 1)
+SET sesion:usuario:1 "token_seguro_alice_99" EX 60
+
+# 4. CORROBORACIÓN DE CUENTA REGRESIVA DE SESION DEL USUARIO (TTL)
+# ------------------------------------------
+TTL sesion:usuario:1
+
+
+

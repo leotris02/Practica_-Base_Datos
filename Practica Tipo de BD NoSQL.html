@@ -598,13 +598,13 @@ WHERE vehicle_id = 'veh001';</pre>
 
       <h3>6.3. Redis — Sesiones y caché de batería</h3>
       <p class="small">Creación de una sesión temporal con expiración automática en 60 segundos.</p>
-      <pre>SET sesion:token:ABC123 "user_001|veh001|trip_9001" EX 60
-TTL sesion:token:ABC123</pre>
+      <pre>SET sesion:usuario:1 "token_seguro_alice_99" EX 60
+TTL sesion:usuario:1</pre>
 
       <p class="small">Registro de batería de tres vehículos distintos usando convención jerárquica con dos puntos.</p>
-      <pre>HSET vehiculo:veh001 tipo patinete bateria 87 disponible true
-HSET vehiculo:veh002 tipo bicicleta bateria 65 disponible true
-HSET vehiculo:veh003 tipo coche bateria 43 disponible false
+      <pre>HSET vehiculo:001 tipo "patinete" marca "Xiaomi" bateria 100 disponible true
+HSET vehiculo:002 tipo "bici" marca "Orbea" bateria 85 disponible false
+HSET vehiculo:003 tipo "coche" marca "Tesla" bateria 40 disponible false
 
 HINCRBY vehiculo:veh001 bateria -5
 HGETALL vehiculo:veh001</pre>
@@ -754,7 +754,16 @@ RETURN DISTINCT candidate.name;
 
         <h3>Captura de inserción y consulta en MongoDB.</h3>
       
-        <h3>Captura de comandos Redis con TTL y modificación de batería.</h3>
+        
+        <h3>7.2.1 Docker up y entrar a redis</h3>
+        <img src="imagenes/redis/docker_up.png" alt="">
+        <img src="imagenes/redis/ingresar_redis.png" alt="">
+        <h3>7.2.2 Captura de carga de vehículos, consulta de datos y modificación de batería</h3>
+        <img src="imagenes/redis/carga_vehiculos.png" alt="">
+        <h3>7.2.3 Creación de token de usuario y TTL</h3>
+        <img src="imagenes/redis/expira_usuario.png" alt="">
+
+
         <h3>7.3.1 Captura del grafo en neo4j</h3>
         <img src="imagenes/neo4j/neo_carga.png" alt="">
         <h3>7.3.2 Captura de consulta en neo4j</h3>
