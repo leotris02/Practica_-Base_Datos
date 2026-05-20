@@ -4,9 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Memoria Técnica - EcoDrive</title>
-  <link rel="preconnect" href="[fonts.googleapis.com](https://fonts.googleapis.com)">
-  <link rel="preconnect" href="[fonts.gstatic.com](https://fonts.gstatic.com)" crossorigin>
-  <link href="[fonts.googleapis.com](https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap)" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
       --primary: #007bff;
@@ -175,7 +175,6 @@
     }
 
     .badge.mongo { background: #e8f5e9; color: #2e7d32; }
-    .badge.cassandra { background: #ede7f6; color: #5e35b1; }
     .badge.redis { background: #ffebee; color: #c62828; }
     .badge.neo4j { background: #e3f2fd; color: #1565c0; }
 
@@ -280,8 +279,8 @@
       <h1>Memoria Técnica — Persistencia Políglota con Bases de Datos NoSQL</h1>
       <p>
         Documento de análisis, justificación arquitectónica, auditoría de código generado con IA,
-        scripts de carga y consultas realizados para los cuatro subsistemas críticos de EcoDrive:
-        catálogo de vehículos, telemetría IoT, sesiones activas y red social de carpooling.
+        scripts de carga y consultas realizados para los sistemas críticos de EcoDrive:
+        catálogo de vehículos, sesiones activas y red social de carpooling.
       </p>
     </header>
 
@@ -300,7 +299,7 @@
       </div>
       <div class="meta-card">
         <div class="label">Tecnologías</div>
-        <div class="value">MongoDB, Cassandra, Redis y Neo4j</div>
+        <div class="value">MongoDB, Redis y Neo4j</div>
       </div>
     </section>
 
@@ -347,12 +346,6 @@
             <td>Permite almacenar vehículos con atributos distintos y un historial de mantenimiento flexible dentro del mismo documento.</td>
           </tr>
           <tr>
-            <td>Telemetría y sensores IoT</td>
-            <td>Apache Cassandra</td>
-            <td>Columnar</td>
-            <td>Optimizado para escrituras masivas, escalado horizontal y consulta eficiente del historial temporal por vehículo.</td>
-          </tr>
-          <tr>
             <td>Sesiones activas y caché de batería</td>
             <td>Redis</td>
             <td>Clave-valor</td>
@@ -378,16 +371,6 @@
             Esto permite almacenar tipos de vehículos distintos sin un esquema rígido.
           </p>
           <p><strong>Campos incrustados:</strong> <code>mantenimientos</code>, <code>piezas</code>, <code>coste</code>, <code>fecha</code>.</p>
-        </div>
-
-        <div class="card">
-          <span class="badge cassandra">Cassandra</span>
-          <h4>Partition Key y Clustering Column</h4>
-          <p>
-            La tabla de telemetría se ha diseñado siguiendo el enfoque query-first.
-            La <code>Partition Key</code> es <code>vehicle_id</code> y la <code>Clustering Column</code> es <code>event_time</code>.
-          </p>
-          <p><strong>Objetivo:</strong> consultar el historial completo de un vehículo de forma eficiente.</p>
         </div>
 
         <div class="card">
@@ -423,12 +406,6 @@ Debe incluir patinetes, bicicletas y coches con atributos diferentes por tipo.
 Incluye historial de mantenimiento.
 Evita diseño relacional y usa documentos agregados si vehículo y mantenimiento se consultan juntos.</pre>
 
-      <h3>Prompt para Cassandra</h3>
-      <pre>Genera un script CQL para telemetría IoT de vehículos de EcoDrive.
-La consulta principal es obtener el historial completo de un vehículo concreto por fecha.
-Diseña la tabla con enfoque query-first, indicando Partition Key y Clustering Column correctos.
-Inserta 5 registros para el mismo vehículo.</pre>
-
       <h3>Prompt para Redis</h3>
       <pre>Genera comandos Redis para sesiones temporales y caché de batería de vehículos de EcoDrive.
 Usa TTL para sesiones y evita usar solo strings para todo.
@@ -457,18 +434,7 @@ Evita tratar los nodos como tablas relacionales.</pre>
         de agregado documental.
       </p>
 
-      <h3>Corrección técnica 2 — Cassandra: rediseño de la clave primaria</h3>
-      <p>
-        La propuesta inicial no estaba orientada a la consulta real del sistema y utilizaba un diseño de clave
-        primaria poco adecuado. Se rediseñó la tabla usando <code>vehicle_id</code> como
-        <code>Partition Key</code> y <code>event_time</code> como <code>Clustering Column</code>.
-      </p>
-      <p>
-        Este cambio permite que los datos de un mismo vehículo queden agrupados lógicamente y que el historial
-        pueda consultarse por orden temporal, evitando además problemas de distribución como hotspots.
-      </p>
-
-      <h3>Corrección técnica 3 — Redis: uso de HASH en lugar de String JSON</h3>
+      <h3>Corrección técnica 2 — Redis: uso de HASH en lugar de String JSON</h3>
       <p>
         La IA proponía almacenar el estado de cada vehículo como un único string con formato JSON. Aunque funcional,
         esta solución no es la más eficiente para Redis cuando se quiere modificar solo un campo concreto.
@@ -478,7 +444,7 @@ Evita tratar los nodos como tablas relacionales.</pre>
         lo que permite actualizar directamente la batería sin reescribir todo el objeto.
       </p>
 
-      <h3>Corrección técnica 4 — Neo4j: relaciones con semántica</h3>
+      <h3>Corrección técnica 3 — Neo4j: relaciones con semántica</h3>
       <p>
         Se revisó el modelado para asegurar que Neo4j no se usara como una tabla SQL disfrazada.
         Las relaciones se definieron con nombres y dirección clara, por ejemplo
@@ -558,45 +524,7 @@ db.vehiculos.insertMany([
   { _id: 1, tipo: 1, marca: 1, modelo: 1, tipo_combustible: 1 }
 )</pre>
 
-      <h3>6.2. Cassandra — Telemetría IoT</h3>
-      <p class="small">Creación del keyspace y de la tabla siguiendo un diseño orientado a consulta.</p>
-      <pre>CREATE KEYSPACE IF NOT EXISTS ecodrive
-WITH replication = {'class': 'SimpleStrategy', 'replication_factor': 1};
-
-USE ecodrive;
-
-CREATE TABLE IF NOT EXISTS telemetria_por_vehiculo (
-    vehicle_id text,
-    event_time timestamp,
-    lat double,
-    lon double,
-    speed double,
-    battery_level int,
-    PRIMARY KEY ((vehicle_id), event_time)
-) WITH CLUSTERING ORDER BY (event_time DESC);</pre>
-
-      <p class="small">Inserción de cinco registros de telemetría para el mismo vehículo.</p>
-      <pre>INSERT INTO telemetria_por_vehiculo (vehicle_id, event_time, lat, lon, speed, battery_level)
-VALUES ('veh001', '2026-04-28 08:00:00', 40.4168, -3.7038, 12.5, 96);
-
-INSERT INTO telemetria_por_vehiculo (vehicle_id, event_time, lat, lon, speed, battery_level)
-VALUES ('veh001', '2026-04-28 08:05:00', 40.4171, -3.7042, 14.0, 94);
-
-INSERT INTO telemetria_por_vehiculo (vehicle_id, event_time, lat, lon, speed, battery_level)
-VALUES ('veh001', '2026-04-28 08:10:00', 40.4175, -3.7048, 10.8, 92);
-
-INSERT INTO telemetria_por_vehiculo (vehicle_id, event_time, lat, lon, speed, battery_level)
-VALUES ('veh001', '2026-04-28 08:15:00', 40.4180, -3.7053, 0.0, 91);
-
-INSERT INTO telemetria_por_vehiculo (vehicle_id, event_time, lat, lon, speed, battery_level)
-VALUES ('veh001', '2026-04-28 08:20:00', 40.4184, -3.7059, 16.1, 89);</pre>
-
-      <p class="small">Consulta del historial completo de telemetría de un vehículo específico.</p>
-      <pre>SELECT *
-FROM telemetria_por_vehiculo
-WHERE vehicle_id = 'veh001';</pre>
-
-      <h3>6.3. Redis — Sesiones y caché de batería</h3>
+      <h3>6.2. Redis — Sesiones y caché de batería</h3>
       <p class="small">Creación de una sesión temporal con expiración automática en 60 segundos.</p>
       <pre>SET sesion:usuario:1 "token_seguro_alice_99" EX 60
 TTL sesion:usuario:1</pre>
@@ -609,7 +537,7 @@ HSET vehiculo:003 tipo "coche" marca "Tesla" bateria 40 disponible false
 HINCRBY vehiculo:veh001 bateria -5
 HGETALL vehiculo:veh001</pre>
 
-      <h3>6.4. Neo4j — Red social de carpooling</h3>
+      <h3>6.3. Neo4j — Red social de carpooling</h3>
       <p class="small">Inserción de nodos y relaciones entre usuarios y rutas.</p>
       <pre>// =======================
 // NODOS: PERSONAS
@@ -773,8 +701,7 @@ RETURN DISTINCT candidate.name;
       <p>
         La práctica demuestra que una arquitectura NoSQL eficaz no consiste en sustituir una base de datos
         relacional por otra única tecnología, sino en seleccionar el motor más adecuado para cada necesidad concreta.
-        En este caso, MongoDB ofrece flexibilidad documental para el catálogo, Cassandra soporta la telemetría masiva,
-        Redis resuelve el estado temporal con gran velocidad y Neo4j modela de forma natural la red social de usuarios.
+        En este caso, MongoDB ofrece flexibilidad documental para el catálogo, Redis resuelve el estado temporal con gran velocidad y Neo4j modela de forma natural la red social de usuarios.
       </p>
       <p>
         Además, la auditoría del código generado con IA ha permitido corregir varios antipatrones habituales,
@@ -788,7 +715,7 @@ RETURN DISTINCT candidate.name;
         <li>Leandro Trista Hernandez</li>
         <li>Tomas Galdeano Williasm</li>
         <li>Manuel Rey Laguarde</li>
-        <li>Carlos</li>
+        <li>Carlos Martín Codina</li>
       </ul>
       <strong>Práctica:</strong> Arquitectura Políglota en EcoDrive<br>
       <strong>Formato recomendado:</strong> abrir en navegador y exportar con “Imprimir → Guardar como PDF”
