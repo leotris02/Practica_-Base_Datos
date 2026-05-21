@@ -380,7 +380,7 @@
             Para sesiones temporales se ha usado expiración automática mediante TTL.
             Para la batería y estado de los vehículos se han utilizado estructuras <code>HASH</code>.
           </p>
-          <p><strong>Claves:</strong> <code>sesion:token:ABC123</code>, <code>vehiculo:veh001</code>.</p>
+          <p><strong>Claves:</strong> <code>sesion:usuario:1</code>, <code>vehiculo:veh001</code>.</p>
         </div>
 
         <div class="card">
@@ -434,14 +434,17 @@ Evita tratar los nodos como tablas relacionales.</pre>
         de agregado documental.
       </p>
 
-      <h3>Corrección técnica 2 — Redis: uso de HASH en lugar de String JSON</h3>
+      <h3>Corrección técnica 2 — Redis: uso de HASH en lugar de String</h3>
       <p>
-        La IA proponía almacenar el estado de cada vehículo como un único string con formato JSON. Aunque funcional,
+        La IA proponía almacenar el estado de cada vehículo como un único string con SET. Aunque funcional,
         esta solución no es la más eficiente para Redis cuando se quiere modificar solo un campo concreto.
       </p>
       <p>
-        Se cambió a estructuras <code>HASH</code> mediante <code>HSET</code> y <code>HINCRBY</code>,
-        lo que permite actualizar directamente la batería sin reescribir todo el objeto.
+        Para la representación de la flota de vehículos, se ha optado por la estructura HASH (HSET) en lugar de claves simples STRING (SET) por las siguientes razones: <br><br>
+1.	Agrupación Lógica y Cohesión: Un vehículo en EcoDriver no es un dato único, sino un objeto con múltiples atributos (marca, batería, estado). El uso de HSET permite agrupar todos estos campos bajo una única clave (vehiculo:veh001), manteniendo el espacio de nombres organizado y facilitando el acceso a la entidad completa.
+<br><br>2.	Flexibilidad y Operaciones Atómicas: El uso de Hashes permite ejecutar comandos específicos como HINCRBY sobre un solo campo (la batería) sin tener que leer, modificar y volver a escribir todo el objeto. Esto garantiza la integridad de los datos en un entorno de alta concurrencia como es el seguimiento de una flota en tiempo real.
+<br><br>En EcoDriver, Redis no solo almacena datos, sino que gestiona el ciclo de vida del alquiler. Se utiliza la funcionalidad de expiración automática (TTL) para las sesiones de viaje. Mientras el vehículo envía señales de telemetría (latidos), el tiempo de expiración se refresca. Si la señal se pierde por más de 60 segundos, Redis elimina la clave, permitiendo que el sistema gestione automáticamente el fin del trayecto o posibles incidencias de conectividad.
+
       </p>
 
       <h3>Corrección técnica 3 — Neo4j: relaciones con semántica</h3>
@@ -530,9 +533,9 @@ db.vehiculos.insertMany([
 TTL sesion:usuario:1</pre>
 
       <p class="small">Registro de batería de tres vehículos distintos usando convención jerárquica con dos puntos.</p>
-      <pre>HSET vehiculo:001 tipo "patinete" marca "Xiaomi" bateria 100 disponible true
-HSET vehiculo:002 tipo "bici" marca "Orbea" bateria 85 disponible false
-HSET vehiculo:003 tipo "coche" marca "Tesla" bateria 40 disponible false
+      <pre>HSET vehiculo:veh001 tipo "patinete" marca "Xiaomi" bateria 100 disponible true
+HSET vehiculo:veh002 tipo "bicicleta" marca "Orbea" bateria 85 disponible false
+HSET vehiculo:veh003 tipo "coche" marca "Renault" bateria 40 disponible false
 
 HINCRBY vehiculo:veh001 bateria -5
 HGETALL vehiculo:veh001</pre>
@@ -718,7 +721,6 @@ RETURN DISTINCT candidate.name;
         <li>Carlos Martín Codina</li>
       </ul>
       <strong>Práctica:</strong> Arquitectura Políglota en EcoDrive<br>
-      <strong>Formato recomendado:</strong> abrir en navegador y exportar con “Imprimir → Guardar como PDF”
     </footer>
   </div>
 </body>
