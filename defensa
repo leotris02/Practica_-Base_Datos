@@ -1,11 +1,13 @@
 1) Añadir en Neo fechas a los viajes.
 
 2) Simular lo siguiente:
+HGET vehiculo:veh002 disponible
+hset vehiculo:veh002 disponible true
 
 Aparece un usuario nuevo - Paul:
 
 Alquila una bici eléctrica Orbea (deja de estar diponible):
-
+hset vehiculo:veh002 disponible false
 
 Le gasta 20% de batería:
 
@@ -15,5 +17,6 @@ Lo rompe:
 
 Se le arregla el pinchazo:
 
+hset vehiculo:veh002 disponible true
 
 Paul ha viajado de Zaragoza a Valencia.
