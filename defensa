@@ -6,6 +6,8 @@ hset vehiculo:veh002 disponible true
 
 Aparece un usuario nuevo - Paul:
 
+SET sesion:usuario:11 "token_seguro_paul_88" EX 10000
+
 Alquila una bici eléctrica Orbea (deja de estar diponible):
 hset vehiculo:veh002 disponible false
 
