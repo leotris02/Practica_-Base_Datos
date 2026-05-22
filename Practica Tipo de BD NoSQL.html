@@ -685,7 +685,12 @@ RETURN DISTINCT candidate.name;
         interfaces visuales como Mongo Express, RedisInsight o Neo4j Browser.
       </p>
 
-        <h3>Captura de inserción y consulta en MongoDB.</h3>
+        <h3>7.1  Captura de inserción y consulta en MongoDB.</h3>
+        <h4>7.1.1 Ejecuto el codigo: <pre>docker exec -i mongodb-server mongoimport --db ecodrive --collection vehiculos <br>--file /src/ecodrive-seed.json --jsonArray;</pre> para cargar el scrip con la informacion de los datos que voy a insertar a la base de datos</h4>
+        <img src="imagenes/mongo/Carga de datos.png" alt="">
+        <h4>7.1.2 Consulta de vehículos con el atributo tipo_combustible</h4>
+        <img src="imagenes/mongo/Consulta.png" alt="">
+
       
         
         <h3>7.2.1 Docker up y entrar a redis</h3>
