@@ -10,7 +10,8 @@ Alquila una bici eléctrica Orbea (deja de estar diponible):
 hset vehiculo:veh002 disponible false
 
 Le gasta 20% de batería:
-
+HGET vehiculo:veh002 bateria
+HSET vehiculo:veh002 bateria 68
 
 Lo rompe:
 
