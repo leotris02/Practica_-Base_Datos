@@ -1,0 +1,61 @@
+[
+    {
+        "_id": "veh001",
+        "tipo": "patinete",
+        "marca": "Xiaomi",
+        "modelo": "Mi Scooter Pro 2",
+        "autonomia_km": 45,
+        "limite_peso_kg": 100,
+        "disponible": true,
+        "mantenimientos": [
+            {
+                "fecha": "2026-03-01T10:00:00Z",
+                "tipo": "freno",
+                "piezas": [
+                    "pastillas de freno"
+                ],
+                "coste": 35
+            }
+        ]
+    },
+    {
+        "_id": "veh002",
+        "tipo": "bicicleta",
+        "marca": "Orbea",
+        "modelo": "Urban Ride",
+        "autonomia_km": 70,
+        "marchas": 7,
+        "disponible": true,
+        "mantenimientos": [
+            {
+                "fecha": "2026-03-12T09:30:00Z",
+                "tipo": "transmisión",
+                "piezas": [
+                    "cadena",
+                    "piñón"
+                ],
+                "coste": 55
+            }
+        ]
+    },
+    {
+        "_id": "veh003",
+        "tipo": "coche",
+        "marca": "Renault",
+        "modelo": "Zoe",
+        "autonomia_km": 300,
+        "tipo_combustible": "eléctrico",
+        "plazas": 5,
+        "disponible": false,
+        "mantenimientos": [
+            {
+                "fecha": "2026-03-20T16:00:00Z",
+                "tipo": "batería",
+                "piezas": [
+                    "módulo BMS"
+                ],
+                "coste": 320
+            }
+        ]
+    }
+]
